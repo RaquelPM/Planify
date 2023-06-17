@@ -52,3 +52,6 @@ gem "jwt", "~> 2.7"
 
 gem "bcrypt", "~> 3.1"
 
+gem "olive_branch", "~> 4.0"
+
+gem "active_model_serializers", "~> 0.10.13"

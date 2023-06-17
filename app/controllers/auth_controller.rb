@@ -1,4 +1,5 @@
 class AuthController < ApplicationController
+  # POST /auth/login
   def login
     # @type [String]
     email = params[:email]
