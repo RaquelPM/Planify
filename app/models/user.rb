@@ -3,22 +3,27 @@
 # Table name: users
 #
 #  id              :integer          not null, primary key
-#  name            :string           not null
-#  user_name       :string           not null
+#  avatar_url      :string
+#  description     :text
 #  email           :string           not null
+#  name            :string           not null
 #  password_digest :string           not null
 #  phone           :string
-#  description     :text
-#  avatar_url      :string
+#  user_name       :string           not null
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
+#
+# Indexes
+#
+#  index_users_on_email      (email) UNIQUE
+#  index_users_on_user_name  (user_name) UNIQUE
 #
 class User < ApplicationRecord
   has_secure_password
 
   validates :name, :user_name, :email, presence: true
   validates :user_name, :email, uniqueness: { case_sensitive: false }
-  validates :name, length: { minimum: 3, maximum: 150 }
+  validates :name, length: { minimum: 3, maximum: 80 }
   validates :user_name, length: { minimum: 3, maximum: 16 }, format: { with: /\A[a-zA-Z0-9\-_]*\Z/ }
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :password, length: { minimum: 8 }, if: -> { new_record? or !password.nil? }

@@ -10,7 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_06_16_010200) do
+ActiveRecord::Schema[7.0].define(version: 2023_06_21_222218) do
+  create_table "events", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.datetime "start_date", null: false
+    t.datetime "finish_date"
+    t.string "place", null: false
+    t.boolean "is_public", default: false
+    t.integer "creator_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["creator_id"], name: "index_events_on_creator_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "name", null: false
     t.string "user_name", null: false
@@ -25,4 +38,5 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_16_010200) do
     t.index ["user_name"], name: "index_users_on_user_name", unique: true
   end
 
+  add_foreign_key "events", "users", column: "creator_id"
 end

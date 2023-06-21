@@ -2,7 +2,7 @@ class UsersController < ApplicationController
   before_action :set_user, only: %i[show update destroy]
   before_action :authenticate, only: %i[update destroy]
   before_action :ensure_ownership, only: %i[update destroy]
-  
+
   # GET /users
   def index
     @users = User.all
@@ -59,8 +59,8 @@ class UsersController < ApplicationController
 
     # Only allow authenticated user to update or delete self
     def ensure_ownership
-      if @current_user.id != @user.id
-        render json: { error: 'Unauthorized operation' }, status: :unauthorized
-      end
+      return unless @current_user.id != @user.id
+
+      render json: { error: 'Unauthorized operation' }, status: :unauthorized
     end
 end
