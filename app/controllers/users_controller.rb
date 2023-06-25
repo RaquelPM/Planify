@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
   before_action :set_user, only: %i[show update destroy]
-  before_action :authenticate, only: %i[update destroy]
+  before_action :authenticate, only: %i[update destroy events created_events]
+  before_action :soft_authenticate, only: %i[index show]
   before_action :ensure_ownership, only: %i[update destroy]
 
   # GET /users
@@ -38,6 +39,19 @@ class UsersController < ApplicationController
   # DELETE /users/1
   def destroy
     @user.destroy
+  end
+
+  # GET /users/1/events
+  def events
+    participants = Participant.where(user_id: @current_user.id)
+
+    render json: participants.map(&:event)
+  end
+
+  def created_events
+    events = Event.where(creator_id: @current_user.id)
+
+    render json: events
   end
 
   private

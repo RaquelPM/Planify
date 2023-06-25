@@ -7,15 +7,15 @@ class AuthController < ApplicationController
     password = params[:password]
 
     if email.nil? or password.nil?
-      render json: { error: 'Missing email or password' }, status: :bad_request 
-    
+      render json: { error: 'Missing email or password' }, status: :bad_request
+
       return
     end
 
     email.downcase!
 
     begin
-      user = User.find_by(email: email)
+      user = User.find_by_email(email)
 
       if !user.nil? and user.authenticate(password)
         payload = { user_id: user.id, exp: Time.now.to_i + (24 * 60 * 60) }

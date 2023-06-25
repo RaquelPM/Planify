@@ -1,14 +1,12 @@
 class ApplicationController < ActionController::API
   protected
 
-  def authenticate
+  def soft_authenticate
+    @current_user = nil
+
     token = request.headers['Authorization']
 
-    if token.nil?
-      render json: { error: 'Missing token' }, status: :unauthorized
-
-      return
-    end
+    return 'Missing token' if token.nil?
 
     token = token.split[1]
 
@@ -18,10 +16,18 @@ class ApplicationController < ActionController::API
       user_id = decoded_token[0]['user_id']
 
       @current_user = User.find(user_id)
+
+      nil
     rescue JWT::ExpiredSignature, JWT::VerificationError, JWT::DecodeError
-      render json: { error: 'Invalid token' }, status: :unauthorized
+      'Invalid token'
     rescue ActiveRecord::RecordNotFound
-      render json: { error: 'Invalid user' }, status: :unauthorized
+      'Invalid user'
     end
+  end
+
+  def authenticate
+    error = soft_authenticate
+
+    render json: { error: } unless error.nil?
   end
 end

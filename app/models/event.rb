@@ -7,7 +7,7 @@
 #  finish_date :datetime
 #  is_public   :boolean          default(FALSE)
 #  name        :string           not null
-#  place       :string
+#  place       :string           not null
 #  start_date  :datetime         not null
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
@@ -34,4 +34,7 @@ class Event < ApplicationRecord
 
   scope :search_by_name, ->(name) { where('LOWER(name) LIKE ?', "%#{name.downcase}%") }
   scope :search_by_creator, ->(creator) { where('creator_id = ?', creator.id) }
+  scope :list, lambda { |user_id|
+    left_joins(:participant).where(["participant.user_id = ? or event.is_public = true", user_id])
+  }
 end
