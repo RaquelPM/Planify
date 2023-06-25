@@ -21,6 +21,9 @@
 class User < ApplicationRecord
   has_secure_password
 
+  has_many :participations
+  has_many :events, through: :participations
+
   validates :name, :user_name, :email, presence: true
   validates :user_name, :email, uniqueness: { case_sensitive: false }
   validates :name, length: { minimum: 3, maximum: 80 }
@@ -36,4 +39,6 @@ class User < ApplicationRecord
   before_save do
     self.email = email.downcase
   end
+
+  private :participations, :participations= 
 end

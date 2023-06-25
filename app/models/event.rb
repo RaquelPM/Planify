@@ -25,6 +25,8 @@ class Event < ApplicationRecord
   # @!attribute creator
   #   @return [User]
   belongs_to :creator, class_name: :User, foreign_key: :creator_id
+  has_many :participations
+  has_many :participants, through: :participations, source: :user
 
   validates :name, :start_date, :creator_id, presence: true
   validates :name, length: { minimum: 3, maximum: 150 }
@@ -34,7 +36,10 @@ class Event < ApplicationRecord
 
   scope :search_by_name, ->(name) { where('LOWER(name) LIKE ?', "%#{name.downcase}%") }
   scope :search_by_creator, ->(creator) { where('creator_id = ?', creator.id) }
-  scope :list, lambda { |user_id|
-    left_joins(:participant).where(["participant.user_id = ? or event.is_public = true", user_id])
+  scope :list, lambda { |current_user|
+    joins("LEFT JOIN participations ON participations.event_id = events.id AND participations.user_id = #{current_user&.id || -1}")
+    .where("participations.user_id IS NOT NULL OR events.is_public")
   }
+  
+  private :participations, :participations=
 end

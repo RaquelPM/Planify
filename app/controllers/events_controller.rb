@@ -6,7 +6,7 @@ class EventsController < ApplicationController
 
   # GET /events
   def index
-    @events = Event.list(@current_user&.id)
+    @events = Event.list(@current_user)
 
     render json: @events
   end
@@ -23,7 +23,7 @@ class EventsController < ApplicationController
     @event.creator_id = @current_user.id
 
     if @event.save
-      Participant.create(user_id: @current_user.id, event_id: @event.id)
+      @event.participants << @current_user
 
       render json: @event, status: :created, location: @event, presentation: :detailed
     else
@@ -47,25 +47,25 @@ class EventsController < ApplicationController
 
   # POST /events/1/join
   def join
-    @participant = Participant.new(user_id: @current_user.id, event_id: @event.id)
+    @participation = Participation.new(user_id: @current_user.id, event_id: @event.id)
 
-    if @participant.save
-      render json: @event, presentation: :detailed
-    else
-      render json: @participant.errors, status: :unprocessable_entity
-    end
+    @participation.save
+    
+    render json: @event, presentation: :detailed
   end
 
   # POST /events/1/leave
   def leave
-    Participant.destroy_by(user_id: @current_user.id, event_id: @event.id)
+    @participation = Participation.find_by(user_id: @current_user.id, event_id: @event.id)
+
+    @participation&.destroy
   end
 
   # GET /events/1/participants
   def participants
-    participants = Participant.where(event_id: @event.id)
+    @participants = @event.participants
 
-    render json: participants.map(&:user)
+    render json: @participants
   end
 
   private

@@ -12,15 +12,16 @@
 #
 #  index_participants_on_event_id  (event_id)
 #  index_participants_on_user_id   (user_id)
+#  unique_participant_per_event    ("user", "event") UNIQUE
 #
 # Foreign Keys
 #
 #  event_id  (event_id => events.id)
 #  user_id   (user_id => users.id)
 #
-class Participant < ApplicationRecord
+class Participation < ApplicationRecord
   belongs_to :user
   belongs_to :event
 
-  validates :user_id, uniqueness: { scope: :event_id }
+  validates :user, uniqueness: { scope: :event_id, message: 'has already joined the event' }
 end

@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: %i[show update destroy]
+  before_action :set_user, only: %i[show update destroy events created_events]
   before_action :authenticate, only: %i[update destroy events created_events]
   before_action :soft_authenticate, only: %i[index show]
   before_action :ensure_ownership, only: %i[update destroy]
@@ -43,21 +43,22 @@ class UsersController < ApplicationController
 
   # GET /users/1/events
   def events
-    participants = Participant.where(user_id: @current_user.id)
+    @events = @user.events
 
-    render json: participants.map(&:event)
+    render json: @events
   end
 
+  # GET /users/1/events/created
   def created_events
-    events = Event.where(creator_id: @current_user.id)
+    @events = @user.events.where(creator_id: @user.id)
 
-    render json: events
+    render json: @events
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_user
-      @user = User.find(params[:id])
+      @user = User.find(params[:id] || params[:user_id])
     rescue ActiveRecord::RecordNotFound
       render json: { error: 'User not found' }, status: :not_found
     end
