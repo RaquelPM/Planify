@@ -1,7 +1,6 @@
 class UsersController < ApplicationController
   before_action :set_user, only: %i[show update destroy events created_events]
-  before_action :authenticate, only: %i[update destroy events created_events]
-  before_action :soft_authenticate, only: %i[index show]
+  before_action :ensure_authenticated, only: %i[update destroy]
   before_action :ensure_ownership, only: %i[update destroy]
 
   # GET /users
@@ -43,14 +42,14 @@ class UsersController < ApplicationController
 
   # GET /users/1/events
   def events
-    @events = @user.events
+    @events = @user.events.authorized(@current_user)
 
     render json: @events
   end
 
   # GET /users/1/events/created
   def created_events
-    @events = @user.events.where(creator_id: @user.id)
+    @events = @user.events.where(creator_id: @user.id).authorized(@current_user)
 
     render json: @events
   end

@@ -1,7 +1,6 @@
 class EventsController < ApplicationController
   before_action :set_event, only: %i[show update destroy join leave participants]
-  before_action :authenticate, only: %i[create update destroy join leave]
-  before_action :soft_authenticate, only: %i[index show participants]
+  before_action :ensure_authenticated, only: %i[create update destroy join leave]
   before_action :ensure_ownership, only: %i[update destroy]
 
   # GET /events
