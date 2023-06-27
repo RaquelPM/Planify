@@ -5,9 +5,7 @@ class EventsController < ApplicationController
 
   # GET /events
   def index
-    @events = Event.list(@current_user)
-
-    render json: @events
+    paginate(:Event, filters: search_params)
   end
 
   # GET /events/1
@@ -49,7 +47,7 @@ class EventsController < ApplicationController
     @participation = Participation.new(user_id: @current_user.id, event_id: @event.id)
 
     @participation.save
-    
+
     render json: @event, presentation: :detailed
   end
 
@@ -81,6 +79,12 @@ class EventsController < ApplicationController
   # Only allow a list of trusted parameters through.
   def event_params
     params.require(:event).permit(:name, :description, :start_date, :finish_date, :place, :is_public)
+  rescue ActionController::ParameterMissing
+    {}
+  end
+
+  def search_params
+    params.require(:event).permit(:name, :description, :place)
   rescue ActionController::ParameterMissing
     {}
   end

@@ -5,9 +5,7 @@ class UsersController < ApplicationController
 
   # GET /users
   def index
-    @users = User.all
-
-    render json: @users
+    paginate(:User, filters: search_params)
   end
 
   # GET /users/1
@@ -67,6 +65,12 @@ class UsersController < ApplicationController
       return_params = params.require(:user).permit(:name, :user_name, :email, :phone, :description, :avatar_url)
 
       return_params.merge(params.permit(:password))
+    rescue ActionController::ParameterMissing
+      {}
+    end
+
+    def search_params
+      params.require(:user).permit(:name, :user_name, :email)
     rescue ActionController::ParameterMissing
       {}
     end

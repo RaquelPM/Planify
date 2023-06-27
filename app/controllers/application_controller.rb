@@ -34,4 +34,29 @@ class ApplicationController < ActionController::API
       render json: { error: @auth_error }
     else
   end
+
+  def paginate(class_name, filters: {})
+    model = class_name.to_s.constantize
+
+    page = params[:page]&.to_i || 1
+    limit = params[:limit]&.to_i || 50
+    sort_by = params[:sort_by] || 'updated_at'
+    order_by = params[:order_by] || params[:sort_by] ? 'ASC' : 'DESC'
+
+    content = model.pagination(filters:, page:, limit:, sort_by:, order_by:)
+
+    total = model.count
+
+    json = {}
+
+    json[:content] = ActiveModelSerializers::SerializableResource.new(content)
+
+    json[:pagination] = {
+      current_page: page,
+      total_pages: (total / limit.to_f).ceil,
+      total_elements: total
+    }
+
+    render json:
+  end
 end
