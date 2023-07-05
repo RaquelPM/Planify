@@ -1,9 +1,7 @@
 class AuthController < ApplicationController
   # POST /auth/login
   def login
-    # @type [String]
     email = params[:email]
-    # @type [String]
     password = params[:password]
 
     if email.nil? or password.nil?
@@ -22,7 +20,7 @@ class AuthController < ApplicationController
 
         token = JWT.encode payload, Rails.application.secrets.secret_key_base.to_s, 'HS256'
 
-        render json: { token: token }
+        render json: { token: }
       else
         render json: { error: 'Invalid email or password' }, status: :unauthorized
       end

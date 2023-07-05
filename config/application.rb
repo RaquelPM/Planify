@@ -2,6 +2,8 @@ require_relative "boot"
 
 require "rails/all"
 
+require_relative "../lib/snake_to_camel"
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
@@ -24,6 +26,6 @@ module Planify
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
-    config.middleware.use OliveBranch::Middleware, inflection: 'camel'
+    config.middleware.use SnakeToCamel::Middleware
   end
 end

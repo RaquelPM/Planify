@@ -5,7 +5,7 @@ class UsersController < ApplicationController
 
   # GET /users
   def index
-    paginate(:User, filters: search_params)
+    paginate(:User, where: search_params)
   end
 
   # GET /users/1
@@ -40,45 +40,46 @@ class UsersController < ApplicationController
 
   # GET /users/1/events
   def events
-    @events = @user.events.authorized(@current_user)
+    @events = @user.events.allowed(@current_user)
 
     render json: @events
   end
 
   # GET /users/1/events/created
   def created_events
-    @events = @user.events.where(creator_id: @user.id).authorized(@current_user)
+    @events = @user.events.where(creator_id: @user.id).allowed(@current_user)
 
     render json: @events
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_user
-      @user = User.find(params[:id] || params[:user_id])
-    rescue ActiveRecord::RecordNotFound
-      render json: { error: 'User not found' }, status: :not_found
-    end
 
-    # Only allow a list of trusted parameters through.
-    def user_params
-      return_params = params.require(:user).permit(:name, :user_name, :email, :phone, :description, :avatar_url)
+  # Use callbacks to share common setup or constraints between actions.
+  def set_user
+    @user = User.find(params[:id] || params[:user_id])
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'User not found' }, status: :not_found
+  end
 
-      return_params.merge(params.permit(:password))
-    rescue ActionController::ParameterMissing
-      {}
-    end
+  # Only allow a list of trusted parameters through.
+  def user_params
+    return_params = params.require(:user).permit(:name, :user_name, :email, :phone, :description, :avatar_url)
 
-    def search_params
-      params.require(:user).permit(:name, :user_name, :email)
-    rescue ActionController::ParameterMissing
-      {}
-    end
+    return_params.merge(params.permit(:password))
+  rescue ActionController::ParameterMissing
+    {}
+  end
 
-    # Only allow authenticated user to update or delete self
-    def ensure_ownership
-      return unless @current_user.id != @user.id
+  def search_params
+    params.require(:user).permit(:name, :user_name, :email)
+  rescue ActionController::ParameterMissing
+    {}
+  end
 
-      render json: { error: 'Unauthorized operation' }, status: :unauthorized
-    end
+  # Only allow authenticated user to update or delete self
+  def ensure_ownership
+    return unless @current_user.id != @user.id
+
+    render json: { error: 'Unauthorized operation' }, status: :unauthorized
+  end
 end

@@ -35,7 +35,7 @@ class Event < ApplicationRecord
   validates :finish_date, comparison: { greater_than: :start_date }, if: -> { !finish_date.nil? }
 
   scope :search_by_name, ->(name) { where('LOWER(name) LIKE ?', "%#{name.downcase}%") }
-  scope :authorized, lambda { |current_user|
+  scope :allowed, lambda { |current_user|
     joins(
       <<~CUSTOM_SQL
         LEFT JOIN participations current_user_participations
@@ -50,6 +50,6 @@ class Event < ApplicationRecord
         CUSTOM_SQL
       )
   }
-  
+
   private :participations, :participations=
 end

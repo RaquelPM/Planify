@@ -5,7 +5,7 @@ class EventsController < ApplicationController
 
   # GET /events
   def index
-    paginate(:Event, filters: search_params)
+    paginate(:Event, where: search_params, scope: -> { allowed(@current_user) })
   end
 
   # GET /events/1
@@ -71,7 +71,7 @@ class EventsController < ApplicationController
   def set_event
     id = params[:id] || params[:event_id]
 
-    @event = Event.find(id)
+    @event = Event.allowed(@current_user).find(id)
   rescue ActiveRecord::RecordNotFound
     render json: { error: 'Event not found' }, status: :not_found
   end
